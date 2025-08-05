@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface ERC20TransferInterface {
     function transfer(address to, uint256 value) external returns(bool);
+    function balanceOf(address account) external view returns (uint256);
 }
 
 contract YesserCoin is ERC20, Ownable, ERC20Burnable {
@@ -44,7 +45,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
         }
     }
 
-    function migrate_old_tokens(uint256 amount) external {
+    function migrate_old_tokens(uint256 amount) public {
         require(
             MAX_SUPPLY >= currentSupply + amount,
             "Total supply after transaction would exceed maximum supply"
@@ -53,6 +54,13 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
         bool success = OLD_CONTRACT.transfer(OLD_CONTRACT_ADDRESS, amount);
         require(success, "Failed to transfer old tokens");
         _mint(msg.sender, amount);
+    }
+
+    function migrate_all_old_tokens() external {
+        require(mintingEnabled, "Minting is disabled");
+        uint256 balance = OLD_CONTRACT.balanceOf(msg.sender);
+        require(balance > 0, "Old YSC balance must is not greater than 0");
+        migrate_old_tokens(balance);
     }
 
     function get_current_supply() public view returns (uint256) {
