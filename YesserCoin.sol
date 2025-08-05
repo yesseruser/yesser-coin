@@ -4,10 +4,14 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+using Strings for uint256;
+using Strings for address;
 
 interface ERC20TransferInterface {
     function transfer(address to, uint256 value) external returns(bool);
     function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
 }
 
 contract YesserCoin is ERC20, Ownable, ERC20Burnable {
@@ -54,6 +58,8 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
             MAX_SUPPLY >= currentSupply + amount,
             "Total supply after transaction would exceed maximum supply"
         );
+
+        require(OldContract.allowance(msg.sender, address(this)) >= amount, string.concat("Not enough allowance from the old contract. Call approve(", address(this).toHexString(), ", ", amount.toString(), ") on the old contract"));
 
         bool success = OldContract.transfer(OLD_CONTRACT_ADDRESS, amount);
         require(success, "Failed to transfer old tokens");
