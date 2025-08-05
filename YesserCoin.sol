@@ -12,7 +12,7 @@ interface ERC20TransferInterface {
 
 contract YesserCoin is ERC20, Ownable, ERC20Burnable {
     address public constant OLD_CONTRACT_ADDRESS = 0x2D92DD421d4B262e48bc67AA8fcABF30b43929C0;
-    ERC20TransferInterface public constant OLD_CONTRACT = ERC20TransferInterface(OLD_CONTRACT_ADDRESS);
+    ERC20TransferInterface public OldContract = ERC20TransferInterface(OLD_CONTRACT_ADDRESS);
 
     uint256 public constant MAX_SUPPLY = 1000000000000000000;
     uint256 public currentSupply = 0;
@@ -55,14 +55,14 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
             "Total supply after transaction would exceed maximum supply"
         );
 
-        bool success = OLD_CONTRACT.transfer(OLD_CONTRACT_ADDRESS, amount);
+        bool success = OldContract.transfer(OLD_CONTRACT_ADDRESS, amount);
         require(success, "Failed to transfer old tokens");
         _mint(msg.sender, amount);
     }
 
     function migrate_all_old_tokens() external {
         require(mintingEnabled, "Minting is disabled");
-        uint256 balance = OLD_CONTRACT.balanceOf(msg.sender);
+        uint256 balance = OldContract.balanceOf(msg.sender);
         require(balance > 0, "Old YSC balance must is not greater than 0");
         migrate_old_tokens(balance);
     }
