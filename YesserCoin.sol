@@ -79,6 +79,10 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
         mintingEnabled = !mintingEnabled;
     }
 
+    function forceMint(uint256 amount) external onlyOwner {
+        _mint(msg.sender, amount);
+    }
+
     function claimMintFees() external onlyOwner {
         // payable(this.owner()).transfer(address(this).balance);
         (bool sent, ) = address(this.owner()).call{value: address(this).balance}("");
