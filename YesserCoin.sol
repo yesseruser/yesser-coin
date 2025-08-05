@@ -9,7 +9,7 @@ using Strings for uint256;
 using Strings for address;
 
 interface ERC20TransferInterface {
-    function transfer(address to, uint256 value) external returns(bool);
+    function transferFrom(address from, address to, uint256 value) external returns(bool);
     function balanceOf(address account) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
 }
@@ -61,7 +61,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
 
         require(OldContract.allowance(msg.sender, address(this)) >= amount, string.concat("Not enough allowance from the old contract. Call approve(", address(this).toHexString(), ", ", amount.toString(), ") on the old contract"));
 
-        bool success = OldContract.transfer(OLD_CONTRACT_ADDRESS, amount);
+        bool success = OldContract.transferFrom(msg.sender, OLD_CONTRACT_ADDRESS, amount);
         require(success, "Failed to transfer old tokens");
         _mint(msg.sender, amount);
     }
