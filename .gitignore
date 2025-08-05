@@ -1,0 +1,5 @@
+.deploys/
+.deps/
+.states/
+artifacts/
+scenario*.json
