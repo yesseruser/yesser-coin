@@ -70,6 +70,6 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 0;
+        return 2;
     }
 }
