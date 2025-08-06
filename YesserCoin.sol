@@ -19,7 +19,6 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
     ERC20TransferInterface public OldContract = ERC20TransferInterface(OLD_CONTRACT_ADDRESS);
 
     uint256 public constant MAX_SUPPLY = 1000000000000000000;
-    uint256 public currentSupply = 0;
     uint256 public mintPrice = 1 gwei;
     bool public mintingEnabled = true;
 
@@ -32,14 +31,13 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
             "Initial supply exceeds maximum supply"
         );
         _mint(msg.sender, initialSupply);
-        currentSupply += initialSupply;
     }
 
     function mint(uint256 amount) external payable {
         require(mintingEnabled, "Minting is disabled");
         require(msg.value >= amount * mintPrice, "Insufficient payment");
         require(
-            MAX_SUPPLY >= currentSupply + amount,
+            MAX_SUPPLY >= totalSupply() + amount,
             "Total supply after transaction would exceed maximum supply"
         );
         _mint(msg.sender, amount);
@@ -55,7 +53,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
         require(mintingEnabled, "Minting is disabled");
 
         require(
-            MAX_SUPPLY >= currentSupply + amount,
+            MAX_SUPPLY >= totalSupply() + amount,
             "Total supply after transaction would exceed maximum supply"
         );
 
@@ -74,7 +72,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
     }
 
     function get_current_supply() public view returns (uint256) {
-        return currentSupply;
+        return totalSupply();
     }
 
     function setMintPrice(uint256 newPrice) external onlyOwner {
