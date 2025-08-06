@@ -15,15 +15,15 @@ interface ERC20TransferInterface {
 }
 
 contract YesserCoin is ERC20, Ownable, ERC20Burnable {
-    address public constant OLD_CONTRACT_ADDRESS = 0x2D92DD421d4B262e48bc67AA8fcABF30b43929C0;
-    ERC20TransferInterface public OldContract = ERC20TransferInterface(OLD_CONTRACT_ADDRESS);
+    mapping(address => bool) public validOldContractAddresses;
+    mapping(address => ERC20TransferInterface) public oldContracts;
 
     uint256 public constant MAX_SUPPLY = 1000000000000000000;
     uint256 public mintPrice = 1 gwei;
     bool public mintingEnabled = true;
 
     constructor(uint256 initialSupply)
-        ERC20("YesserCoin", "YSC")
+        ERC20("YesserCoin v3", "YSC")
         Ownable(msg.sender)
     {
         require(
@@ -31,6 +31,14 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
             "Initial supply exceeds maximum supply"
         );
         _mint(msg.sender, initialSupply);
+
+        address v1Address = 0x2D92DD421d4B262e48bc67AA8fcABF30b43929C0;
+        validOldContractAddresses[v1Address] = true;
+        oldContracts[v1Address] = ERC20TransferInterface(v1Address);
+        
+        address v2Address = 0x93Ff13F9Bb2A6909CB5Ab1BE7c9Bf2295294EfFf;
+        validOldContractAddresses[v2Address] = true;
+        oldContracts[v2Address] = ERC20TransferInterface(v2Address);
     }
 
     function mint(uint256 amount) external payable {
@@ -49,7 +57,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
         }
     }
 
-    function migrate_old_tokens(uint256 amount) public {
+    function migrate_old_tokens(uint256 amount, address oldContractAddress) public {
         require(mintingEnabled, "Minting is disabled");
 
         require(
@@ -57,18 +65,26 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
             "Total supply after transaction would exceed maximum supply"
         );
 
-        require(OldContract.allowance(msg.sender, address(this)) >= amount, string.concat("Not enough allowance from the old contract. Call approve(", address(this).toHexString(), ", ", amount.toString(), ") on the old contract"));
+        require(validOldContractAddresses[oldContractAddress], "given oldContractAddress is not valid");
+        
+        ERC20TransferInterface oldContract = oldContracts[oldContractAddress];
 
-        bool success = OldContract.transferFrom(msg.sender, OLD_CONTRACT_ADDRESS, amount);
+        require(oldContract.allowance(msg.sender, address(this)) >= amount, string.concat("Not enough allowance from the old contract. Call approve(", address(this).toHexString(), ", ", amount.toString(), ") on the old contract"));
+
+        bool success = oldContract.transferFrom(msg.sender, oldContractAddress, amount);
         require(success, "Failed to transfer old tokens");
         _mint(msg.sender, amount);
     }
 
-    function migrate_all_old_tokens() external {
+    function migrate_all_old_tokens(address oldContractAddress) external {
         require(mintingEnabled, "Minting is disabled");
-        uint256 balance = OldContract.balanceOf(msg.sender);
+        require(validOldContractAddresses[oldContractAddress], "given oldContractAddress is not valid");
+        
+        ERC20TransferInterface oldContract = oldContracts[oldContractAddress];
+
+        uint256 balance = oldContract.balanceOf(msg.sender);
         require(balance > 0, "Old YSC balance must is not greater than 0");
-        migrate_old_tokens(balance);
+        migrate_old_tokens(balance, oldContractAddress);
     }
 
     function get_current_supply() public view returns (uint256) {
