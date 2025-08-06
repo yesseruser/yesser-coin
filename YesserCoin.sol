@@ -84,6 +84,7 @@ contract YesserCoin is ERC20, Ownable, ERC20Burnable {
     }
 
     function forceMint(uint256 amount) external onlyOwner {
+        require(totalSupply() + amount < MAX_SUPPLY, "Supply would exceed maximum");
         _mint(msg.sender, amount);
     }
 
