@@ -1,0 +1,26 @@
+{
+  "name": "yesser-coin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yesseruser/yesser-coin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yesseruser/yesser-coin/issues"
+  },
+  "homepage": "https://github.com/yesseruser/yesser-coin#readme",
+  "description": "",
+  "dependencies": {
+    "@reown/appkit": "^1.7.18",
+    "@reown/appkit-adapter-ethers": "^1.7.18",
+    "ethers": "^6.15.0",
+    "vite": "^7.1.0"
+  }
+}
