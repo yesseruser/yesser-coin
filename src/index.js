@@ -1,7 +1,7 @@
 import {createAppKit} from "@reown/appkit";
 import {EthersAdapter} from "@reown/appkit-adapter-ethers";
 import {sepolia} from "@reown/appkit/networks";
-import {getCurrentBalance} from "/src/modules/contractHandler.js";
+import {getCurrentBalance, getV1Balance} from "/src/modules/contractHandler.js";
 
 const PROJECT_ID = "50f3aefeae0553f61bd9321167d87e8f";
 
@@ -30,7 +30,12 @@ modal.subscribeProviders(async (state) => {
 
   if (provider) {
     const balance = Number(await getCurrentBalance(modal)) * 0.01;
+    const v1Balance = Number(await getV1Balance(modal));
     document.getElementById("currentBalance").textContent = "Current balance: " + String(balance) + " YSC";
+    if (v1Balance != 0) {
+      document.getElementById("v1Balance").textContent = "V1 balance: " + String(v1Balance) + " YSC";
+      document.getElementById("migrateButton").style.display = "";
+    }
     document.getElementById("balances").style.display = "";
   }
 });

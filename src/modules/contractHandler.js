@@ -1,5 +1,5 @@
 import {BrowserProvider, Contract, parseEther} from "ethers";
-import {CONTRACT_ADDRESS} from '/src/modules/addresses.js';
+import {CONTRACT_ADDRESS, V1_ADDRESS} from '/src/modules/addresses.js';
 
 const YSC_ABI = [
   "function mint(uint256 amount) payable",
@@ -39,5 +39,13 @@ export async function getCurrentBalance(modal) {
   const address = signer.address;
 
   const contract = new Contract(CONTRACT_ADDRESS, YSC_ABI, signer);
+  return await contract.balanceOf(address);
+}
+
+export async function getV1Balance(modal) {
+  const signer = await getSignerFromModal(modal);
+  const address = signer.address;
+
+  const contract = new Contract(V1_ADDRESS, YSC_ABI, signer);
   return await contract.balanceOf(address);
 }
