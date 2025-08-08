@@ -1,5 +1,5 @@
 import {BrowserProvider, Contract, parseEther} from "ethers";
-import {CONTRACT_ADDRESS} from '/modules/addresses.js';
+import {CONTRACT_ADDRESS} from '/src/modules/addresses.js';
 
 const YSC_ABI = [
   "function mint(uint256 amount) payable",
@@ -18,18 +18,17 @@ async function getSignerFromModal(modal) {
 }
 
 export async function getMintPrice(modal) {
-  signer = await getSignerFromModal(modal);
+  const signer = await getSignerFromModal(modal);
   const contract = new Contract(CONTRACT_ADDRESS, YSC_ABI, signer);
 
   return await contract.mintPrice();
 }
 
 export async function mint(amount, modal) {
-  signer = await getSignerFromModal(modal);
+  const signer = await getSignerFromModal(modal);
   const contract = new Contract(CONTRACT_ADDRESS, YSC_ABI, signer);
-  const cost = getMintPrice(modal);
+  const cost = await getMintPrice(modal);
 
-  console.log(cost);
   const options = {value: cost * BigInt(amount)};
   return await contract.mint(amount, options);
 }
