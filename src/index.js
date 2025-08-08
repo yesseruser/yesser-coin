@@ -1,7 +1,7 @@
 import {createAppKit} from "@reown/appkit";
 import {EthersAdapter} from "@reown/appkit-adapter-ethers";
 import {sepolia} from "@reown/appkit/networks";
-import {mint} from "/src/modules/contractHandler.js";
+import {getCurrentBalance} from "/src/modules/contractHandler.js";
 
 const PROJECT_ID = "50f3aefeae0553f61bd9321167d87e8f";
 
@@ -22,5 +22,15 @@ const modal = createAppKit({
     onramp: false,
     email: false,
     socials: false,
+  }
+});
+
+modal.subscribeProviders(async (state) => {
+  const provider = state["eip155"];
+
+  if (provider) {
+    const balance = Number(await getCurrentBalance(modal)) * 0.01;
+    document.getElementById("currentBalance").textContent = "Current balance: " + String(balance) + " YSC";
+    document.getElementById("balances").style.display = "";
   }
 });

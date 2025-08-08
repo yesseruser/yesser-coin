@@ -3,7 +3,8 @@ import {CONTRACT_ADDRESS} from '/src/modules/addresses.js';
 
 const YSC_ABI = [
   "function mint(uint256 amount) payable",
-  "function mintPrice() view returns(uint256)"
+  "function mintPrice() view returns(uint256)",
+  "function balanceOf(address account) view returns(uint256)"
 ];
 
 async function getSignerFromModal(modal) {
@@ -31,4 +32,12 @@ export async function mint(amount, modal) {
 
   const options = {value: cost * BigInt(amount)};
   return await contract.mint(amount, options);
+}
+
+export async function getCurrentBalance(modal) {
+  const signer = await getSignerFromModal(modal);
+  const address = signer.address;
+
+  const contract = new Contract(CONTRACT_ADDRESS, YSC_ABI, signer);
+  return await contract.balanceOf(address);
 }
